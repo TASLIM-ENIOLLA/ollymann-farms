@@ -178,7 +178,7 @@ export default () => {
                 .hero-bg{
                     background-size: cover;
                     background-position: center;
-                    background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/demos/demo-21/slider/slide-1.png);
+                    background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/demos/demo-21/slider/dietmar-reichle-caiX9QloFc8-unsplash.jpg);
                 }
                 @media screen and (max-width: 576px){
                     .h3-sm{
