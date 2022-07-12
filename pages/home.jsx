@@ -67,7 +67,7 @@ export default () => {
                     <div className="row">
                         <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
                             <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'url(/assets/images/products/vegetable/2.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
-                                <h4 className = 'text-uppercase text-dark'>veges</h4>
+                                <h4 className = 'text-uppercase text-white'>veges</h4>
                                 <p>
                                     <a href="/shop?category=veges" className = 'fo-s-15 text-capitalize'>
                                         shop now 
