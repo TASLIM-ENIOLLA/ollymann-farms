@@ -66,10 +66,10 @@ export default () => {
                 <div className="container py-4">
                     <div className="row">
                         <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'url(/assets/images/products/vegetable/2.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
+                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/products/vegetable/2.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
                                 <h4 className = 'text-uppercase text-white'>veges</h4>
                                 <p>
-                                    <a href="/shop?category=veges" className = 'fo-s-15 text-capitalize'>
+                                    <a href="/shop?category=veges" className = 'fo-s-15 text-white text-capitalize'>
                                         shop now 
                                         <span className = 'bi ml-2 bi-arrow-right'></span>
                                     </a>
@@ -77,10 +77,10 @@ export default () => {
                             </div>
                         </div>
                         <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'url(/assets/images/products/fruits/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
+                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/products/fruits/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
                                 <h4 className = 'text-uppercase text-white'>fruits</h4>
                                 <p>
-                                    <a href="/shop?category=fruits" className = 'fo-s-15 text-capitalize'>
+                                    <a href="/shop?category=fruits" className = 'fo-s-15 text-white text-capitalize'>
                                         shop now 
                                         <span className = 'bi ml-2 bi-arrow-right'></span>
                                     </a>
