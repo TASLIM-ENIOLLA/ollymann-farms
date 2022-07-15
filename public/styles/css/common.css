@@ -1,7 +1,7 @@
 :root{
     /* --secondary-theme-color: rgba(81, 97, 206, 1); */
     --theme-color: #60c21b;
-    --theme-bg: #98c73a;
+    --theme-bg: #60c21b;
 }
 /* @font-face{
     font-family: calibri;
@@ -49,7 +49,7 @@ a{
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-family: MontserratMedium !important;
     text-decoration: none;
 }
@@ -399,6 +399,9 @@ a{
 }
 .visibility-0{
     visibility: hidden;
+}
+.visibility-visible{
+    visibility: visible;
 }
 .slideInToTop{
     animation: slideInToTop .2s ease;
