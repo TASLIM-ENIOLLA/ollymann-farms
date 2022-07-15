@@ -1,19 +1,59 @@
 import Header from '../components/Page/Header'
 import Footer from '../components/Page/Footer'
 import {ProductCard} from '../components/ProductCard'
+import {API_ROUTE} from '../config'
+import {useEffect, useState, useContext} from 'react'
+import {GlobalContext} from '../components/context/GlobalContext'
+import {notify} from '../components/Popups'
 import {LargeBlogCard, SmallBlogCard} from '../components/Blog'
 
-export default () => {
+const newArrivalsCategory = ['all','men','women','shoes','accessories']
+
+export default ({cart: unrefinedCart}) => {
+    const {globalStates: {cart: {state: refinedCart}}} = useContext(GlobalContext)
+    const [bestSellers, setBestSellers] = useState([])
+    const [newArrivals, setNewArrivals] = useState([])
+    const [newArrivalsMain, setNewArrivalsMain] = useState([])
+    const [NA, setNA] = useState('all')
+    const [NL, setNL] = useState('')
+    
+    useEffect(async () => {
+        const req = await fetch(API_ROUTE.home)
+        const {data: {bestSellers, newArrivals}} = await req.json()
+
+        setBestSellers(bestSellers.map(
+            (each) => ({
+                ...each,
+                isCarted: !!unrefinedCart[each.id]
+            })
+        ))
+        setNewArrivals(newArrivals.map(
+            (each) => ({
+                ...each,
+                isCarted: !!unrefinedCart[each.id]
+            })
+        ))
+    }, [])
+    
+    useEffect(() => {
+        if(NA !== 'all'){
+            setNewArrivals(newArrivalsMain.filter(e => e.category === NA))
+        }
+        else{
+            setNewArrivals(newArrivalsMain)
+        }
+    }, [NA])
+
     return (
         <>
+            {/* <TopRibbon></TopRibbon> */}
+            <Header></Header>
             <section>
-                <Header />
-                <hr className = 'm-0 border-top' />
-                <section className = 'hero-bg'>
-                    <div className="container">
-                        <div className="row">
-                            <div className="col-lg-12">
-                                <div className = 'min-height-450px intro flex-v j-c-c'>
+                <div className="container-fluid">
+                    <div className="row" style = {{backgroundSize: 'cover', backgroundPosition: 'center', backgroundImage: `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.3)), url(/assets/images/backgrounds/2.jpg)`}}>
+                        <div className="px-5 col-12">
+                            <div style={{minHeight: '600px'}} className = 'container flex-v a-i- j-c-c'>
+                                <div className = 'intro'>
                                     <div className="content">
                                         <h3 className  = 'h3-sm text-capitalize'>Growing Our Community's Food</h3>
                                     </div>
@@ -29,63 +69,54 @@ export default () => {
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
             </section>
             <section className = 'py-5'>
                 <div className="p-5">
                     <div className="fa-2x bold text-center">BEST SELLERS</div>
-                    <p className="content text-center">The Trends Boutique: The latest fashion trends from top brands!</p>
+                    <p className="content text-center">Here's our fastest selling farm produce</p>
                 </div>
                 <div className="container py-4">
-                    <div className="row">
-                        <ProductCard id = {1} type = 'best' images = {[
-                            '/assets/images/products/okra/1.jpg',
-                            '/assets/images/products/okra/2.jpg',
-                            '/assets/images/products/okra/3.jpg',
-                        ]} price = '300' category = 'veges' name = 'okra' rating = '3' />
-                        <ProductCard id = {2} type = 'hot' images = {[
-                            '/assets/images/products/pepper/1.jpg',
-                            '/assets/images/products/pepper/2.jpg',
-                            '/assets/images/products/pepper/3.jpg',
-                        ]} price = '260' category = 'veges' name = 'pepper' rating = '3' />
-                        <ProductCard id = {3} type = 'fresh' images = {[
-                            '/assets/images/products/fruits/1.jpg',
-                        ]} price = '2000' measure = 'basket' category = 'fruits' name = 'assorted friuts' rating = '3' />
-                        <ProductCard id = {4} type = 'fresh' images = {[
-                            '/assets/images/products/vegetable/1.jpg',
-                            '/assets/images/products/vegetable/2.jpg',
-                        ]} price = '300' measure = 'bundle' category = 'veges' name = 'vegetable' rating = '3' />
-                    </div>
+                    <div className="row">{(
+                        (bestSellers.length > 0)
+                        ? (
+                            bestSellers.map(
+                                ({name, id, category, isCarted, images, price, type}, key) => (
+                                    (++key < 6)
+                                    ? (
+                                        <ProductCard id = {id} key = {id} type = {type} images = {images.map(e => `${API_ROUTE.product_images}/${id}/${e}`)} price = {price} category = {category} isCarted = {isCarted} name = {name} rating = {Math.floor(((Math.random() * 10) % 5) + 1)} />
+                                    )
+                                    : undefined
+                                )
+                            )
+                        )
+                        : (
+                            <div className="col-auto mx-auto text-c">
+                                <div className = 'animated pulse infinite'>
+                                    <span className="fa-5x bi bi-basket text-muted"></span>
+                                    <p>Oops! We are currently restocking. Please check again soon.</p>
+                                </div>
+                            </div>
+                        )
+                    )}</div>
                 </div>
             </section>
             <section className = 'py-5'>
                 <div className="p-5">
                     <div className="fa-2x bold text-center">CATEGORY</div>
-                    <p className="content text-center">Check out our categories of our farm produce!</p>
+                    <p className="content text-center">Check out our categories of farm produce!</p>
                 </div>
                 <div className="container py-4">
                     <div className="row">
                         <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/products/vegetable/2.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
-                                <h4 className = 'text-uppercase text-white'>veges</h4>
-                                <p>
-                                    <a href="/shop?category=veges" className = 'fo-s-15 text-white text-capitalize'>
-                                        shop now 
-                                        <span className = 'bi ml-2 bi-arrow-right'></span>
-                                    </a>
-                                </p>
-                            </div>
+                            <a href = '/shop?category=veges' className="text-center rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/products/vegetable/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
+                                <h3 className = 'text-uppercase bold letter-spacing-1 text-white'>veges</h3>
+                            </a>
                         </div>
                         <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <div className="rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/products/fruits/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
-                                <h4 className = 'text-uppercase text-white'>fruits</h4>
-                                <p>
-                                    <a href="/shop?category=fruits" className = 'fo-s-15 text-white text-capitalize'>
-                                        shop now 
-                                        <span className = 'bi ml-2 bi-arrow-right'></span>
-                                    </a>
-                                </p>
-                            </div>
+                            <a href = '/shop?category=fruits' className="text-center rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/products/fruits/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
+                                <h3 className = 'text-uppercase bold letter-spacing-1 text-white'>fruits</h3>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -107,7 +138,7 @@ export default () => {
                     </div>
                 </div>
             </section>
-            <section style = {{minHeight: '300px', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(assets/images/backgrounds/bg-2.jpg)`}} className = 'py-5 flex-v j-c-c a-i-c'>
+            <section style = {{minHeight: '300px', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/backgrounds/1.jpg)`}} className = 'py-5 flex-v j-c-c a-i-c'>
                 <div className="container text-c py-5">
                     <div className = 'h1 bold text-white text-capitalize letter-spacing-1'>now available for delivery</div>
                     <div className = 'mt-4'>
@@ -119,7 +150,7 @@ export default () => {
                 <div className="p-5">
                     <div className="fa-2x bold text-center">ABOUT US</div>
                 </div>
-                <div className="container py-4">
+                <div className="container mb-5 py-4">
                     <div className="row text-c">
                         <div className="col-md-6 col-lg-4">
                             <div className = 'border shadow-sm mb-4 rounded-1x px-4 py-5'>
@@ -151,7 +182,7 @@ export default () => {
                     </div>
                 </div>
             </section>
-            <section style = {{minHeight: '0', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `url(assets/images/demos/demo-21/newsLetter/banner.jpg)`}} className = 'py-5'>
+            <section style = {{minHeight: '0', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/backgrounds/1.jpg)`}} className = 'py-5'>
                 <div className="container">
                     <div className="row">
                         <div className="col-12 text-center py-5">
@@ -172,14 +203,6 @@ export default () => {
             </section>
             <Footer />
             <style jsx>{`
-                .min-height-450px{
-                    min-height: 550px;
-                }
-                .hero-bg{
-                    background-size: cover;
-                    background-position: center;
-                    background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/demos/demo-21/slider/dietmar-reichle-caiX9QloFc8-unsplash.jpg);
-                }
                 @media screen and (max-width: 576px){
                     .h3-sm{
                         font-size: 4rem !important;

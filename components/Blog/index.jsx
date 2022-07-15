@@ -1,3 +1,5 @@
+import {API_ROUTE} from '../../config'
+
 export const LargeBlogCard = () => {
     return (
         <div className="border shadow rounded-2x mb-5 overflow-0">
@@ -42,36 +44,44 @@ export const LargeBlogCard = () => {
     )
 }
 
-export const SmallBlogCard = () => {
+export const SmallBlogCard = ({title, id, content, tags, images, timestamp}) => {
+
     return (
         <div className = 'rounded-2x mb-5 overflow-0 border shadow'>
             <div className = 'row m-0'>
                 <div className="col-md-4 col-sm-12 px-0">
                     <div>
-                        <div className = 'bg-secondary rounded-2x shadow' style = {{maxWwidth: '200px', height: '200px'}}></div>
+                        <div className = 'blog-image bg-secondary rounded-2x shadow' style = {{maxWwidth: '200px', height: '200px'}}></div>
                     </div>
                 </div>
                 <div className="col-md p-0 col-sm-12">
                     <div className="p-4">
                         <div className="row a-i-c j-c-space-between">
                             <div className="col-auto">
-                                <div className="rounded-2x theme-bg text-white one-line p-3">SEO Optimization</div>
+                                <div className="rounded-2x theme-bg text-white one-line p-3 text-capitalize">{typeof tags === 'object' ? tags[0] : ''}</div>
                             </div>
                             <div className="col-auto">
-                                <div className = 'text-muted'>6 June, 2022</div>
+                                <div className = 'text-muted'>{new Date(timestamp).toLocaleString()}</div>
                             </div>
                         </div>
                         <div className = 'mt-4'>
-                            <h2 className = 'bold double-line'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur, tenetur.</h2>
+                            <h2 className = 'bold double-line text-capitalize'>{title}</h2>
                         </div>
                         <div className = 'my-3'>
-                            <p className = 'double-line'>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deserunt delectus architecto tempore repudiandae mollitia pariatur quis quia a quibusdam fugiat?
+                            <p className = 'double-line text-capitalize'>
+                                {content}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
+            <style jsx>{`
+                .blog-image{
+                    background-size: cover;
+                    background-position: center;
+                    background-image: url(${API_ROUTE.blog_images}/${id}/${images[0]});
+                }
+            `}</style>
         </div>
     )
 }
