@@ -1,6 +1,6 @@
 import AdminPageTemplate from '../../../components/Admin/Page/AdminPageTemplate'
 import {API_ROUTE} from '../../../config'
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import currency from '../../../components/currency'
 import {notify} from '../../../components/Popups'
 
@@ -41,6 +41,8 @@ const ParseImageFile = ({src, product_id}) => {
 }
 
 export default () => {
+    const [categories, updateCategories] = useState([])
+    const [measures, updateMeasures] = useState([])
     const [formData, setFormData] = useState({
         name: '',
         quantity: 0,
@@ -50,6 +52,14 @@ export default () => {
         description: '',
         images: []
     })
+
+    useEffect(async () => {
+        const req = await fetch(`${API_ROUTE.admin_get_categories_and_measures}`)
+        const {data: {categories, measures}} = await req.json()
+
+        updateCategories(categories)
+        updateMeasures(measures)
+    }, [])
 
     return (
         <AdminPageTemplate >
@@ -86,19 +96,21 @@ export default () => {
                     <div className="col-md-6 mb-5">
                             <p className = 'text-capitalize mb-2'>Product measure *</p>
                             <select value = {formData.measure} onChange = {(e) => setFormData({...formData, measure: e.target.value})} className = 'p-4 d-block text-capitalize w-100 outline-0 border rounded'>
-                                <option className = 'text-capitalize' value="">--- Select measure ---</option>
-                                <option className = 'text-capitalize' value="bowl">bowl</option>
-                                <option className = 'text-capitalize' value="basket">basket</option>
-                                <option className = 'text-capitalize' value="bundle">bundle</option>
-                                <option className = 'text-capitalize' value="sack">sack</option>
+                                <option className = 'text-capitalize' value="">--- Select measure ---</option>{
+                                    measures.map(({id, name}, key) => (
+                                        <option key = {key} className = 'text-capitalize' value={id}>{name}</option>
+                                    ))
+                                }
                             </select>
                         </div>
                     <div className="col-md-6 mb-5">
                         <p className = 'text-capitalize mb-2'>Product category *</p>
                         <select value = {formData.category} onChange = {(e) => setFormData({...formData, category: e.target.value})} className = 'p-4 d-block text-capitalize w-100 outline-0 border rounded'>
-                            <option className = 'text-capitalize' value="">--- Select category ---</option>
-                            <option className = 'text-capitalize' value="veges">veges</option>
-                            <option className = 'text-capitalize' value="fruits">fruits</option>
+                            <option className = 'text-capitalize' value="">--- Select category ---</option>{
+                                categories.map(({id, name}, key) => (
+                                    <option key = {key} className = 'text-capitalize' value={id}>{name}</option>
+                                ))
+                            }
                         </select>
                     </div>
                     <div className="col-md-6 mb-5">
@@ -176,12 +188,12 @@ const AddProduct = async (formData) => {
 }
 
 export async function getServerSideProps(context){
-    const {resolvedUrl, req: {cookies}} = context
+    const {req: {cookies}, params: {productAction}} = context
     const cookie = cookies['OLLYMANN_FARMS_ADMIN'] || undefined
 
-    const paths = ['/admin/add-product', '/admin/edit-product/[productID]']
+    const paths = ['add-product', 'edit-product']
 
-    if(!paths.includes(resolvedUrl)){
+    if(!paths.includes(productAction)){
         return {notFound: true}
     }
 

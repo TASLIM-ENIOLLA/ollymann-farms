@@ -46,7 +46,7 @@ const ProductImagesSmall = ({src, onClick}) => {
 
 const ProductImageLarge = ({src}) => {
     return (
-        <div style = {{
+        <div className = 'border shadom-sm' style = {{
             height: '400px',
             backgroundImage: `url(${src})`,
             backgroundSize: 'contain',

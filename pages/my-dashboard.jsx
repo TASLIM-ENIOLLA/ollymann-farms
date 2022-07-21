@@ -70,7 +70,7 @@ const Orders = () => {
                     <tbody>{
                         customerOrders.map(
                             (order, key) => (
-                                <TableRows index = {++key} key = {key} {...order} />
+                                <TableRows index = {++key} key = {order.id} {...order} />
                             )
                         )
                     }</tbody>
@@ -267,14 +267,14 @@ const Logout = () => {
     )
 }
 
-export default ({isLoggedIn}) => {
+export default () => {
+    const {globalStates: {isLoggedIn: {state: isLoggedIn}}} = useContext(GlobalContext)
+    const [pageTab, setPageTab] = useState('orders')
     const PageContent = {
         'orders': <Orders />,
         'user info': <UserInfo />,
         'logout': <Logout />,
     }
-
-    const [pageTab, setPageTab] = useState('orders')
 
     useEffect(() => {
         if(!isLoggedIn){

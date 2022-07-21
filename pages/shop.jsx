@@ -1,10 +1,11 @@
 import Header from '../components/Page/Header'
 import Footer from '../components/Page/Footer'
 import {ProductCard} from '../components/ProductCard'
-import {useState, useMemo, useRef, useEffect} from 'react'
+import {useState, useRef, useEffect} from 'react'
 import {useRouter} from 'next/router'
 import {API_ROUTE} from '../config'
 import currency from '../components/currency'
+import Loader from '../components/Loader'
 
 const CheckBox = ({...props}) => {
     const [_check, setCheck] = useState(props.checked)
@@ -45,40 +46,46 @@ const Slider = () => {
 }
 
 export default ({cart: unrefinedCart}) => {
-    const [bestSellers, setBestSellers] = useState([])
+    const [bestSellersRoot, setBestSellersRoot] = useState()
+    const [bestSellers, setBestSellers] = useState()
     const [filterBar, setFilterBar] = useState(false)
-    const [minMaxPrice, setMinMaxPrice] = useState({
-        minValue: 0,
-        maxValue: 0
-    })
-    const {query: {category}} = useRouter()
-    const [filters, setFilters] = useState({
-        category: [],
-        sex: []
-    })
+    const [minMaxPrice, setMinMaxPrice] = useState({minValue: 0, maxValue: 0})
+    const {query} = useRouter()
+    const [filters, setFilters] = useState({name: '', category: '', sex: ''})
 
     useEffect(async () => {
+        const {category, name} = query
         const req = await fetch(API_ROUTE.home)
-        const {type, data: {bestSellers}} = await req.json()
+        const {data: {bestSellers}} = await req.json()
 
-        const bestSellersList = bestSellers.map(
-            e => {
-                e['isCarted'] = !!unrefinedCart[e.id]
-                return e
-            }
-        )
-
-        setBestSellers(bestSellersList)
+        setBestSellersRoot(bestSellers)
+        setBestSellers(bestSellers)
+        setFilters({...filters, name: name || '', category: category || ''})
         setMinMaxPrice({
             ...minMaxPrice,
-            minValue: Math.min(...bestSellersList.map(({price}) => price)),
-            maxValue: Math.max(...bestSellersList.map(({price}) => price)),
+            minValue: Math.min(...bestSellers.map(({price}) => price)),
+            maxValue: Math.max(...bestSellers.map(({price}) => price)),
         })
     }, [])
 
+    useEffect(() => {
+        if(bestSellersRoot && bestSellersRoot.length > 0){
+            setBestSellers(
+                bestSellersRoot.filter(({name}) => (
+                    (filters.name.length > 0)
+                    ? new RegExp(filters.name, 'i').test(name)
+                    : true
+                )).filter(({category}) => (
+                    (filters.category.length > 0)
+                    ? new RegExp(filters.category, 'i').test(category)
+                    : true
+                ))
+            )
+        }
+    }, [filters])
+
     return (
         <>
-            {/* <TopRibbon></TopRibbon> */}
             <Header></Header>
             <section className={`${filterBar ? '' : 'd-none'} animated slideInLeft p-5 vh100 flex-v po-fixed top-0 left-0 bg-white shadow`} style = {{width: '90%', maxWidth: '300px', zIndex: 10000}}>
                 <div className = 'flex-h a-i-c j-c-space-between'>
@@ -96,7 +103,7 @@ export default ({cart: unrefinedCart}) => {
                         </div>
                         <div className = 'pt-3'>
                             <label className = 'd-block w-100 mb-4' htmlFor="">
-                                <CheckBox checked = {true} value = 'shoes' onChange = {({target: {checked, value}}) => (checked, value)} />
+                                <CheckBox />
                                 <span className = 'ml-3 text-capitalize'>Shoes</span>
                             </label>
                             <label className = 'd-block w-100 mb-4' htmlFor="">
@@ -111,30 +118,11 @@ export default ({cart: unrefinedCart}) => {
                     </div>
                     <div className = 'mb-5'>
                         <div className="flex-h a-i-c j-c-space-between">
-                            <div className="text-uppercase">sex</div>
-                        </div>
-                        <div className = 'pt-3'>
-                            <label className = 'd-block w-100 mb-4' htmlFor="">
-                                <CheckBox />
-                                <span className = 'ml-3 text-capitalize'>unisex</span>
-                            </label>
-                            <label className = 'd-block w-100 mb-4' htmlFor="">
-                                <CheckBox />
-                                <span className = 'ml-3 text-capitalize'>male</span>
-                            </label>
-                            <label className = 'd-block w-100 mb-4' htmlFor="">
-                                <CheckBox />
-                                <span className = 'ml-3 text-capitalize'>female</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div className = 'mb-5'>
-                        <div className="flex-h a-i-c j-c-space-between">
                             <div className="text-uppercase">price range ({currency})</div>
                         </div>
                         <div className = 'pt-3'>
                             <label className = 'd-block w-100 mb-4' htmlFor="">
-                                {/* <input type="range" min = {minMaxPrice.minValue} max = {minMaxPrice.maxValue} className = 'd-block w-100 bg-danger' /> */}
+                                <input type="range" min = {minMaxPrice.minValue} max = {minMaxPrice.maxValue} className = 'd-block w-100 bg-danger' />
                                 <Slider />
                                 <div className="flex-h a-i-c j-c-space-between">
                                     <div>{currency}{minMaxPrice.minValue}</div>
@@ -186,7 +174,7 @@ export default ({cart: unrefinedCart}) => {
                         </div>
                         <div className="col-xs-12 col-sm-12 col-lg-auto">
                             <div className = 'mb-3 flex-h a-i-c'>
-                                Showing {bestSellers.length} of {bestSellers.length} products
+                                Showing {bestSellers?.length} of {bestSellers?.length} products
                             </div>
                         </div>
                     </div>
@@ -194,35 +182,53 @@ export default ({cart: unrefinedCart}) => {
             </section>
             <section>
                 <div className="container">
-                    <div className="row py-5">{(
-                        (bestSellers.length > 0)
+                    <div className="row py-5">{
+                        (bestSellers)
                         ? (
-                            <>
-                                {bestSellers.map(
-                                    ({name, id, category, isCarted, images, price, type}, key) => (
-                                        <ProductCard id = {id} key = {id} type = {type} images = {images.map(e => `${API_ROUTE.product_images}/${id}/${e}`)} price = {price} category = {category} isCarted = {isCarted} name = {name} rating = {Math.floor(((Math.random() * 10) % 5) + 1)} />
-                                    )
-                                )}
-                                <div className="col-12">
-                                    <div className="py-5 text-center">
-                                        <button className = 'px-5 py-3 d-inline-block text-uppercase border bg-clear rounded'>
-                                            <span>more products</span>
-                                            <span className = 'bi ml-2 bi-arrow-counterclockwise'></span>
-                                        </button>
+                            (bestSellers.length > 0)
+                            ? (
+                                <>
+                                    {bestSellers.map(
+                                        ({name, id, category, isCarted, images, price, type}, key) => (
+                                            <ProductCard id = {id} key = {id} type = {type} images = {images.map(e => `${API_ROUTE.product_images}/${id}/${e}`)} price = {price} category = {category} isCarted = {isCarted} name = {name} rating = {Math.floor(((Math.random() * 10) % 5) + 1)} />
+                                        )
+                                    )}
+                                    <div className="col-12">
+                                        <div className="py-5 text-center">
+                                            <button className = 'px-5 py-3 d-inline-block text-uppercase border bg-clear rounded'>
+                                                <span>more products</span>
+                                                <span className = 'bi ml-2 bi-arrow-counterclockwise'></span>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            </>
-                            
+                                </>
+                                
+                            )
+                            : (
+                                (query)
+                                ? (
+                                    <div className="col-auto mx-auto text-c">
+                                        <div className = 'pb-5'>
+                                            <span className="fa-5x bi bi-bookshelf text-muted"></span>
+                                            <p>Oops! The product you're looking for is currently not on our shelf. Please check out some of our other products.</p>
+                                            <p>
+                                                <span onClick = {() => setFilters({name: '', category: '', sex: ''})} className = 'text-capitalize text-danger underline'>clear search</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                )
+                                : (
+                                    <div className="col-auto mx-auto text-c">
+                                        <div className = 'animated pulse infinite'>
+                                            <span className="fa-5x bi bi-basket text-muted"></span>
+                                            <p>Restocking...</p>
+                                        </div>
+                                    </div>
+                                )
+                            )
                         )
-                        : (
-                            <div className="col-auto mx-auto text-c">
-                                <div className = 'animated pulse infinite'>
-                                    <span className="fa-5x bi bi-basket text-muted"></span>
-                                    <p>Restocking...</p>
-                                </div>
-                            </div>
-                        )
-                    )}</div>
+                        : <Loader />
+                    }</div>
                 </div>
             </section>
             <Footer></Footer>

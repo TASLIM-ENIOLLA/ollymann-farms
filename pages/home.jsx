@@ -1,49 +1,33 @@
-import Header from '../components/Page/Header'
-import Footer from '../components/Page/Footer'
-import {ProductCard} from '../components/ProductCard'
-import {API_ROUTE} from '../config'
-import {useEffect, useState, useContext} from 'react'
-import {GlobalContext} from '../components/context/GlobalContext'
-import {notify} from '../components/Popups'
-import {LargeBlogCard, SmallBlogCard} from '../components/Blog'
+import  Header                            from '../components/Page/Header'
+import  Footer                            from '../components/Page/Footer'
+import  NewsLetter                        from '../components/Page/NewsLetter'
+import {ProductCard}                      from '../components/ProductCard'
+import {API_ROUTE}                        from '../config'
+import {useEffect, useState, useContext}  from 'react'
+import {GlobalContext}                    from '../components/context/GlobalContext'
+import {LargeBlogCard, SmallBlogCard}     from '../components/Blog'
+import  Loader                            from '../components/Loader'
 
 const newArrivalsCategory = ['all','men','women','shoes','accessories']
 
 export default ({cart: unrefinedCart}) => {
     const {globalStates: {cart: {state: refinedCart}}} = useContext(GlobalContext)
-    const [bestSellers, setBestSellers] = useState([])
-    const [newArrivals, setNewArrivals] = useState([])
-    const [newArrivalsMain, setNewArrivalsMain] = useState([])
-    const [NA, setNA] = useState('all')
-    const [NL, setNL] = useState('')
+    const [bestSellers, setBestSellers] = useState()
+    const [blogPosts, setBlogPosts] = useState()
+    const [categories, setCategories] = useState()
     
     useEffect(async () => {
         const req = await fetch(API_ROUTE.home)
-        const {data: {bestSellers, newArrivals}} = await req.json()
+        const {data: {bestSellers, categories, blogPosts}} = await req.json()
 
-        setBestSellers(bestSellers.map(
-            (each) => ({
-                ...each,
-                isCarted: !!unrefinedCart[each.id]
-            })
-        ))
-        setNewArrivals(newArrivals.map(
-            (each) => ({
-                ...each,
-                isCarted: !!unrefinedCart[each.id]
-            })
-        ))
+        setBlogPosts(blogPosts)
+        setCategories(categories)
+        setBestSellers(bestSellers.map((each) => ({
+            ...each,
+            isCarted: !!unrefinedCart[each.id]
+        })))
     }, [])
     
-    useEffect(() => {
-        if(NA !== 'all'){
-            setNewArrivals(newArrivalsMain.filter(e => e.category === NA))
-        }
-        else{
-            setNewArrivals(newArrivalsMain)
-        }
-    }, [NA])
-
     return (
         <>
             {/* <TopRibbon></TopRibbon> */}
@@ -78,26 +62,30 @@ export default ({cart: unrefinedCart}) => {
                 </div>
                 <div className="container py-4">
                     <div className="row">{(
-                        (bestSellers.length > 0)
+                        (bestSellers)
                         ? (
-                            bestSellers.map(
-                                ({name, id, category, isCarted, images, price, type}, key) => (
-                                    (++key < 6)
-                                    ? (
-                                        <ProductCard id = {id} key = {id} type = {type} images = {images.map(e => `${API_ROUTE.product_images}/${id}/${e}`)} price = {price} category = {category} isCarted = {isCarted} name = {name} rating = {Math.floor(((Math.random() * 10) % 5) + 1)} />
+                            (bestSellers.length > 0)
+                            ? (
+                                bestSellers.map(
+                                    ({name, id, category, isCarted, images, price, type}, key) => (
+                                        (++key < 6)
+                                        ? (
+                                            <ProductCard id = {id} key = {id} type = {type} images = {images.map(e => `${API_ROUTE.product_images}/${id}/${e}`)} price = {price} category = {category} isCarted = {isCarted} name = {name} rating = {Math.floor(((Math.random() * 10) % 5) + 1)} />
+                                        )
+                                        : undefined
                                     )
-                                    : undefined
                                 )
                             )
-                        )
-                        : (
-                            <div className="col-auto mx-auto text-c">
-                                <div className = 'animated pulse infinite'>
-                                    <span className="fa-5x bi bi-basket text-muted"></span>
-                                    <p>Oops! We are currently restocking. Please check again soon.</p>
+                            : (
+                                <div className="col-auto mx-auto text-c">
+                                    <div className = 'animated pulse infinite'>
+                                        <span className="fa-5x bi bi-basket text-muted"></span>
+                                        <p>Oops! We are currently restocking. Please check again soon.</p>
+                                    </div>
                                 </div>
-                            </div>
+                            )
                         )
+                        : <Loader />
                     )}</div>
                 </div>
             </section>
@@ -107,18 +95,33 @@ export default ({cart: unrefinedCart}) => {
                     <p className="content text-center">Check out our categories of farm produce!</p>
                 </div>
                 <div className="container py-4">
-                    <div className="row">
-                        <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <a href = '/shop?category=veges' className="text-center rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/products/vegetable/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
-                                <h3 className = 'text-uppercase bold letter-spacing-1 text-white'>veges</h3>
-                            </a>
-                        </div>
-                        <div className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
-                            <a href = '/shop?category=fruits' className="text-center rounded-2x flex-v j-c-c shadow p-3" style = {{minHeight: '150px', backgroundImage: 'linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/products/fruits/1.jpg)', backgroundPosition: 'center', backgroundSize: 'cover'}}>
-                                <h3 className = 'text-uppercase bold letter-spacing-1 text-white'>fruits</h3>
-                            </a>
-                        </div>
-                    </div>
+                    <div className="row">{
+                        (categories)
+                        ? (
+                            (categories.length > 0)
+                            ? categories.map(({name, id, images}, key) => (
+                                <div key = {key} className="col-lg-3 pb-5 col-md-4 col-sm-6 col-xs-12">
+                                    <a href = {`/shop?category=${name}`} className="text-center rounded-2x flex-v j-c-c shadow p-3" style = {{
+                                        minHeight: '150px',
+                                        backgroundImage: `linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(${API_ROUTE.category_images}/${id}/${images[0]})`,
+                                        backgroundPosition: 'center',
+                                        backgroundSize: 'cover'
+                                    }}>
+                                        <h3 className = 'text-uppercase bold letter-spacing-1 text-white'>{name}</h3>
+                                    </a>
+                                </div>
+                            ))
+                            : (
+                                <div className="col-auto mx-auto text-c">
+                                    <div className = 'animated pulse infinite'>
+                                        <span className="fa-5x bi bi-basket text-muted"></span>
+                                        <p>Oops! We are currently restocking. Please check again soon.</p>
+                                    </div>
+                                </div>
+                            )
+                        )
+                        : <Loader />
+                    }</div>
                 </div>
             </section>
             <section className = 'py-5'>
@@ -127,15 +130,43 @@ export default ({cart: unrefinedCart}) => {
                     <p className="content text-center">See our recent activities and know what we are up to...</p>
                 </div>
                 <div className="container py-4">
-                    <div className="row">
-                        <div className="col-lg-5">
-                            <LargeBlogCard />
-                        </div>
-                        <div className="col-lg-7">
-                            <SmallBlogCard />
-                            <SmallBlogCard />
-                        </div>
-                    </div>
+                    <div className="row">{
+                        (blogPosts)
+                        ? (
+                            (blogPosts.length > 0)
+                            ? (
+                                <>
+                                    <div className="col-lg-5">
+                                        <LargeBlogCard href = {`/blog/${blogPosts[0].id}`} {...blogPosts[0]} />
+                                    </div>
+                                    <div className="col-lg-7">{
+                                        blogPosts.map((props, key) => (
+                                            (key > 0 && key < 3)
+                                            ? (
+                                                <SmallBlogCard key = {`${props.id}-${key}`} href = {`/blog/${props.id}`} {...props} />
+                                            )
+                                            : undefined
+                                        ))
+                                    }</div>
+                                </>
+                            )
+                            : (
+                                <div className="col-12">
+                                    <div className="p-5 border text-c text-muted bold letter-spacing-1 rounded-1x shadow-sm col-md-9 mx-auto">
+                                        <div className = 'pb-4'>
+                                            <span className="bi bi-exclamation-square-fill fa-3x"></span>
+                                        </div>
+                                        <p>
+                                            We currently do not have any post in our blog. Stick around to get more update from our blog.
+                                        </p>
+                                    </div>
+                                </div>
+                            )
+                        )
+                        : (
+                            <Loader />
+                        )
+                    }</div>
                 </div>
             </section>
             <section style = {{minHeight: '300px', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(/assets/images/backgrounds/1.jpg)`}} className = 'py-5 flex-v j-c-c a-i-c'>
@@ -182,25 +213,7 @@ export default ({cart: unrefinedCart}) => {
                     </div>
                 </div>
             </section>
-            <section style = {{minHeight: '0', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url(/assets/images/backgrounds/1.jpg)`}} className = 'py-5'>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-12 text-center py-5">
-                            <p className = 'pb-3'>
-                                <span className = 'bi text-white bi-envelope-paper fa-2x'></span>
-                            </p>
-                            <div className = 'h1 bold text-white text-uppercase letter-spacing-1'>subscribe to our newsLetter</div>
-                            <div className = 'text-white mb-5 fo-s-15'>Learn about new offers and get more deals by joining our newsletter</div>
-                            <div className = 'col-md-6 col-sm-9 col-lg-7 mx-auto'>
-                                <div className = 'flex-h rounded overflow-0 bg-white'>
-                                    <input type="email" className = 'p-3 bg-clear border-0 outline-0 flex-1' />
-                                    <input type="submit" value="SUBSCRIBE" className = 'px-4 py-3 text-white border-0 outline-0 bg-warning '/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <NewsLetter />
             <Footer />
             <style jsx>{`
                 @media screen and (max-width: 576px){

@@ -9,52 +9,59 @@ export default ({children, title}) => {
     const {globalStates: {adminData: {state: {f_name, id, profile_img}}}} = useContext(GlobalContext)
 
     return (
-        <div className = "vh100 vw100 po-rel flex-h bg-light text-dark">
-            <div id = "sideBar" className = "col-d-none col-md-d-block h-100 min-width-250px bg-white sideBarShadow">
-                <SideBar />
-            </div>
-            <div id = "mainContent" className = "flex-1 flex-v py-0 px-4 h-100">
-                <div className = 'container-fluid'>
-                    <div className = "row a-i-c j-c-space-between py-5 mb-3">
-                        <div className = 'mr-auto col-md-d-none'>
-                            <div style = {{width: '50px',height: '50px'}} onClick = {() => setShowSideBar(true)} className = 'flex-v a-i-c j-c-c bg-white rounded-1x shadow-sm'>
-                                <span className="bi bi-filter-left fa-2x"></span>
-                            </div>
-                        </div>
-                        <div className = 'ml-auto'>
-                            <div className="flex-h a-i-c">
-                                <div style = {{
-                                    width: '60px',
-                                    height: '60px',
-                                    backgroundPosition: 'center',
-                                    backgroundSize: 'cover',
-                                    backgroundImage: `url(${API_ROUTE.admin_profile_img}/${id}/${profile_img[0]})`
-                                }} className = 'rounded-circle border shadow mr-4'></div>
-                                <div>
-                                    <h4 className = 'bold letter-spacing-1'>Welcome {f_name}</h4>
-                                    <h5 className = 'half-bold mb-0'>Administrator</h5>
+        <div className = "po-rel container-fluid bg-light text-dark">
+            <div className="row vh100 vw100">
+                <div id = "sideBar" className = "px-0 col-d-none col-md-d-block h-100 min-width-250px bg-white sideBarShadow">
+                    <SideBar />
+                </div>
+                <div className="h-100 px-0 col-md">
+                    <div id = "mainContent" className = "flex-v py-0 px-4 h-100">
+                        <div className = 'container-fluid'>
+                            <div className = "row a-i-c j-c-space-between py-5 mb-3">
+                                <div className = 'mr-auto col-auto col-md-d-none'>
+                                    <div style = {{width: '50px',height: '50px'}} onClick = {() => setShowSideBar(true)} className = 'flex-v a-i-c j-c-c bg-white rounded-1x shadow-sm'>
+                                        <span className="bi bi-filter-left fa-2x"></span>
+                                    </div>
+                                </div>
+                                <div className = 'ml-auto col-auto'>
+                                    <div className="flex-h a-i-c">
+                                        <div style = {{
+                                            width: '60px',
+                                            height: '60px',
+                                            backgroundPosition: 'center',
+                                            backgroundSize: 'cover',
+                                            backgroundImage: `url(${API_ROUTE.admin_profile_img}/${id}/${profile_img[0]})`
+                                        }} className = 'rounded-circle border shadow mr-4'></div>
+                                        <div>
+                                            <h4 className = 'bold letter-spacing-1'>Welcome {f_name}</h4>
+                                            <h5 className = 'half-bold mb-0'>Administrator</h5>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div className = 'container-fluid'>
-                    <div className="row a-i-c">{(
-                        (asPath.split('/').length > 3)
-                        ? (
-                            <div onClick = {() => back()} className = 'rounded-circle border mr-4 bg-white flex-v a-i-c j-c-c' style = {{width: '40px', height: '40px'}}>
-                                <span className = 'bi bi-arrow-left mt-1 fa-2x bold'></span>
+                        <div className = 'container-fluid'>
+                            <div className="row a-i-c pb-4">{(
+                                    (asPath.split('/').length > 3)
+                                    ? (
+                                        <div className="col-auto">
+                                            <div onClick = {() => back()} className = 'rounded-circle border bg-white flex-v a-i-c j-c-c' style = {{width: '40px', height: '40px'}}>
+                                                <span className = 'bi bi-arrow-left mt-1 fa-2x bold'></span>
+                                            </div>
+                                        </div>
+                                    )
+                                    : <></>
+                                )}<div className = 'col-auto'>
+                                    <h3 className = 'border-bottom-thic mb-0 bold text-capitalize text-muted letter-spacing-1'>
+                                        {title || String(asPath.match(/(\w+)?\-?\w+$/)[0]).replace(/-/g, ' ')}
+                                    </h3>
+                                </div>
                             </div>
-                        )
-                        : <></>
-                    )}
-                        <h3 className = 'border-bottom-thic mb-0 bold text-capitalize text-muted letter-spacing-1'>
-                            {title || String(asPath.match(/(\w+)?\-?\w+$/)[0]).replace(/-/g, ' ')}
-                        </h3>
+                        </div>
+                        <div className="py-5 container-fluid flex-1 w-100 overflow-y-auto" style = {{maxWidth: '100%'}}>
+                            {children}
+                        </div>
                     </div>
-                </div>
-                <div className="py-5 container-fluid flex-1 w-100 overflow-y-auto">
-                    {children}
                 </div>
             </div>
             <div style = {{background: `rgba(0, 0, 0, .5)`}} className = {`animated fadeIn po-abs hrefp-0 left-0 h-100 w-100 flex-h ${showSideBar ? '' : 'd-none'}`}>
@@ -87,13 +94,13 @@ export default ({children, title}) => {
     )
 }
 
-
 const SideBar = () => {
     const {asPath} = useRouter()
     const urlAndTitle = [
         {url: "/admin/home", title: "Home", icon: <span className = 'fa-2x mr-3 bi bi-house-fill'></span>},
         {url: "/admin/add-product", title: "Add Product", icon: <span className = 'fa-2x mr-3 bi bi-calendar-plus-fill'></span>},
         {url: "/admin/all-products", title: "All Products", icon: <span className = 'fa-2x mr-3 bi bi-collection'></span>},
+        {url: "/admin/categories-and-measures", title: "Categories & Measures", icon: <span className = 'fa-2x mr-3 bi bi-receipt-cutoff'></span>},
         {url: "/admin/blog", title: "Blog", icon: <span className = 'fa-2x mr-3 bi bi-chat-square-text-fill'></span>},
         {url: "/admin/orders", title: "Orders", icon: <span className = 'fa-2x mr-3 bi bi-receipt-cutoff'></span>},
         {url: "/admin/payments", title: "Payments", icon: <span className = 'fa-2x mr-3 bi bi-credit-card-2-back-fill'></span>},
@@ -102,7 +109,7 @@ const SideBar = () => {
     return (
         <div className = 'flex-v h-100'>
             <div className = "py-5">
-                <img className = 'mx-auto' src="/assets/images/demos/demo-21/logo-name.png" width = '120' />
+                <img className = 'mx-auto' src="/assets/images/demos/demo-21/logo-name.png" width = '130' />
             </div>
             <div className = "py-3 flex-1 overflow-y-auto text-secondary">
                 {

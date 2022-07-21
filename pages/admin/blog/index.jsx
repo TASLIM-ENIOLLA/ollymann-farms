@@ -2,7 +2,7 @@ import AdminPageTemplate from '../../../components/Admin/Page/AdminPageTemplate'
 import {API_ROUTE} from '../../../config'
 import {useState, useEffect} from 'react'
 import {Search} from '../../../components/svg/SVGIcons'
-import {SmallBlogCard} from '../../../components/Blog'
+import {SmallBlogCard, LargeBlogCard} from '../../../components/Blog'
 
 export default () => {
     const [postsListMain, setPostsListMain] = useState([])
@@ -54,8 +54,8 @@ export default () => {
             <div className="my-5 row">{(
                 (postsList.length > 0)
                 ? postsList.map((props, key) => (
-                    <div key = {key} className="col-md-12 col-lg-8 col-xl-6 col-sm-12">
-                        <SmallBlogCard {...props} />    
+                    <div key = {key} className="col-md-6 col-lg-6 col-xl-3 col-sm-6">
+                        <LargeBlogCard href = {`/admin/blog/${props.id}`} {...props} />    
                     </div>
                 ))
                 : (

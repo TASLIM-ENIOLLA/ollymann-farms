@@ -59,13 +59,23 @@ const ParseImageFile = ({src, product_id}) => {
 }
 
 export default ({productID}) => {
+    const [categories, updateCategories] = useState([])
+    const [measures, updateMeasures] = useState([])
     const [formData, setFormData] = useState(undefined)
     const [isUpdated, setIsUpdated] = useState(false)
 
     useEffect(async () => {
+        const req = await fetch(`${API_ROUTE.admin_get_categories_and_measures}`)
+        const {data: {categories, measures}} = await req.json()
+
+        updateCategories(categories)
+        updateMeasures(measures)
+    }, [])
+
+    useEffect(async () => {
         if(!isUpdated){
             const req = await fetch(`${API_ROUTE.product_data}?productID=${productID}`)
-            const {data, type} = await req.json()
+            const {data} = await req.json()
             
             setFormData(data)
         }
@@ -110,19 +120,21 @@ export default ({productID}) => {
                         <div className="col-md-6 mb-5">
                             <p className = 'text-capitalize mb-2'>Product measure *</p>
                             <select value = {formData?.measure} onChange = {(e) => (setIsUpdated(true), setFormData({...formData, measure: e.target.value}))} className = 'p-4 d-block text-capitalize w-100 outline-0 border rounded'>
-                                <option className = 'text-capitalize' value="">--- Select measure ---</option>
-                                <option className = 'text-capitalize' value="bowl">bowl</option>
-                                <option className = 'text-capitalize' value="basket">basket</option>
-                                <option className = 'text-capitalize' value="bundle">bundle</option>
-                                <option className = 'text-capitalize' value="sack">sack</option>
+                                <option className = 'text-capitalize' value="">--- Select measure ---</option>{
+                                    measures.map(({id, name}, key) => (
+                                        <option key = {key} className = 'text-capitalize' value={id}>{name}</option>
+                                    ))
+                                }
                             </select>
                         </div>
                         <div className="col-md-6 mb-5">
                             <p className = 'text-capitalize mb-2'>Product category *</p>
                             <select value = {formData?.category} onChange = {(e) => (setIsUpdated(true), setFormData({...formData, category: e.target.value}))} className = 'p-4 d-block text-capitalize w-100 outline-0 border rounded'>
-                                <option className = 'text-capitalize' value="">--- Select category ---</option>
-                                <option className = 'text-capitalize' value="veges">veges</option>
-                                <option className = 'text-capitalize' value="fruits">fruits</option>
+                                <option className = 'text-capitalize' value="">--- Select category ---</option>{
+                                    categories.map(({id, name}, key) => (
+                                        <option key = {key} className = 'text-capitalize' value={id}>{name}</option>
+                                    ))
+                                }
                             </select>
                         </div>
                         <div className="col-md-6 mb-5">
@@ -200,10 +212,10 @@ export default ({productID}) => {
 }
 
 export async function getServerSideProps(context){
-    const {resolvedUrl, req: {cookies}, query: {productID}} = context
+    const {req: {cookies}, query: {productID}, params: {productAction}} = context
     const cookie = cookies['OLLYMANN_FARMS_ADMIN'] || undefined
 
-    if(!new RegExp('^/admin/edit-product', 'i').test(resolvedUrl)){
+    if(productAction !== 'edit-product'){
         return {
             notFound: true
         }

@@ -27,21 +27,21 @@ export const ProductCard = ({id = null, type = 'best sale', measure = 'basket', 
         'assets/images/demos/demo-21/bestSellers/product-1-2.jpg'
     ]
 
-    useEffect(() => {
-        cart[id] ? setCarted(true) : setCarted(false)
-    })
+    useEffect(() => cart[id] ? setCarted(true) : setCarted(false))
 
     return (
         <div className="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-            <div className={`border transit rounded-1x po-rel pb-4 mb-5 ${shadow ? 'shadow' : ''}`} onMouseOver = {() => setShadow(true)} onMouseLeave = {() => setShadow(false)}>
+            <div className={`border transit overflow-0 rounded-1x po-rel pb-4 mb-5 ${shadow ? 'shadow' : ''}`} onMouseOver = {() => setShadow(true)} onMouseLeave = {() => setShadow(false)}>
                 <div className="po-abs top-0 left-0 p-4">
-                    <div className = {`px-3 py-2 text-capitalize rounded bg-${type === 'hot' ? 'danger' : 'warning'} text-white`}>{type}</div>
+                    <div className = {`px-3 py-2 text-capitalize shadow rounded bg-${type === 'hot' ? 'danger' : 'warning'} text-white`}>{type}</div>
                 </div>
-                <div className = 'p-2'>
-                    <a href={`/product/${id}`} onMouseOver = {() => images.length > 1 && setImageFlip(1)} onMouseLeave = {() => setImageFlip(0)} className = 'w-100 overflow-0 bg-light flex-v j-c-c' style = {{minHeight: '320px', maxHeight: '320px'}}>
-                        <img src={images[imageFlip]} alt="Product image" className="product-image transit" />
+                <div className = 'p-'>
+                    <a onMouseOver = {() => images.length > 1 && setImageFlip(1)} onMouseLeave = {() => setImageFlip(0)} className = 'product-image w-100 po-rel overflow-0 bg-light'>
+                        <div className={`${!shadow ? 'd-none' : 'animated slideInUp'} black-gradient py-4 px-3 po-abs left-0 bottom-0 w-100`}>
+                            <button title = 'See more about this product...' onClick = {() => window.location = `/product/${id}`} className = 'border outline-0 cursor-pointer overflow-0 px-4 py-3 rounded-1x bg-clear text-capitalize text-white'>view more</button>
+                        </div>
                     </a>
-                    <div className = 'text-center pt-3'>
+                    <div className = 'text-center pt-3 border-top'>
                         <p className = 'text-capitalize text-muted mb-1'>{category}</p>
                         <p className = 'text-capitalize text-dark'>
                             <a href={`/product/${id}`}>{name}</a>
@@ -98,6 +98,18 @@ export const ProductCard = ({id = null, type = 'best sale', measure = 'basket', 
                     </div>
                 </div>
             </div>
+            <style jsx>{`
+                .black-gradient{
+                    background: linear-gradient(transparent, rgba(0,0,0,.8))
+                }
+                .product-image{
+                    min-height: 320px;
+                    max-height: 320px;
+                    background-image: url(${images[imageFlip]});
+                    background-size: cover;
+                    background-position: center;
+                }
+            `}</style>
         </div>
     )
 }

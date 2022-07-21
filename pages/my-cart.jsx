@@ -196,8 +196,8 @@ const CartReceipt = ({cart}) => {
                     <div>{(
                         (Object.values(cart).length > 0)
                         ? Object.values(cart).map(
-                            ({name, quantity, price}, key) => (
-                                <div key = {key} className = 'flex-h j-c-space-between text-muted py-4 border-bottom mb-3'>
+                            ({name, id, quantity, price}) => (
+                                <div key = {id} className = 'flex-h j-c-space-between text-muted py-4 border-bottom mb-3'>
                                     <div className = 'px-3 double-line text-capitalize'>
                                         {name}
                                         <p className="mb-0 mt-2">{quantity} unit{quantity > 1 ? 's' : ''}</p>
@@ -300,8 +300,8 @@ export default () => {
                                             <tbody className = 'text-muted text-center'>{(
                                                 (Object.values(localCart).length > 0)
                                                 ? Object.values(localCart).map(
-                                                    ({name, id, price, quantity, image}, key) => (
-                                                        <CartRow updateCart = {updateCart} id = {id} key = {key} name = {name} price = {price} quantity = {quantity} image = {image} />
+                                                    ({name, id, price, quantity, image}) => (
+                                                        <CartRow updateCart = {updateCart} id = {id} key = {id} name = {name} price = {price} quantity = {quantity} image = {image} />
                                                     )
                                                 )
                                                 : (
@@ -320,8 +320,8 @@ export default () => {
                                 <div className = 'col-lg-d-none col-12'>{(
                                     (Object.values(localCart).length > 0)
                                     ? Object.values(localCart).map(
-                                        ({name, id, price, quantity, image}, key) => (
-                                            <CartBlock updateCart = {updateCart} id = {id} key = {key} name = {name} price = {price} quantity = {quantity} image = {image} />
+                                        ({name, id, price, quantity, image}) => (
+                                            <CartBlock updateCart = {updateCart} id = {id} key = {id} name = {name} price = {price} quantity = {quantity} image = {image} />
                                         )
                                     )
                                     : (

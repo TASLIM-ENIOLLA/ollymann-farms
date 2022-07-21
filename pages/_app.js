@@ -3,9 +3,9 @@ import React, {useState, useEffect} from 'react'
 import GlobalStates from '../components/context/GlobalContext'
 import {useRouter} from 'next/router'
 
-export default ({Component, pageProps: {userCart, userData, adminData, isLoggedIn, ...pageProps}}) => {
+export default ({Component, pageProps: {userCart, adminData, userData, isLoggedIn, ...pageProps}}) => {
     const [cart, updateCart] = useState(userCart || {})
-    const [_adminData, updateAdminData] = useState(adminData)
+    const [_adminData, setAdminData] = useState(adminData)
     const {route} = useRouter()
     const globalStatesValue = {
         cart: {
@@ -59,7 +59,7 @@ export default ({Component, pageProps: {userCart, userData, adminData, isLoggedI
                         ...cookieValue,
                         cart
                     }),
-                    expires: (new Date().getTime() + (356 * 24 * 3600 * 1000)),
+                    expires: new Date(new Date().getTime() + (356 * 24 * 3600 * 1000)),
                     path: '/' 
                 })
             })
