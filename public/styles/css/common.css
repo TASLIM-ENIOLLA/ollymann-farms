@@ -42,6 +42,16 @@ input:-webkit-autofill{
     -webkit-animation-name: autofill;
     -webkit-animation-fill-mode: both;
 }
+::-webkit-scrollbar{
+    width: 7px;
+    height: 7px;
+    background: rgb(238, 235, 235);
+}
+
+::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background: var(--theme-color);
+}
 a{
     color: inherit;
 }
